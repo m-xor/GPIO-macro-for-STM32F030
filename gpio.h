@@ -117,6 +117,21 @@ static INLINE void GPIO_Low(GPIO_TypeDef * const restrict gpio, int pin)
 	gpio -> BRR = 1 << pin;
 }
 
+static INLINE void GPIO_HiMsk(GPIO_TypeDef * const restrict gpio, uint16_t mask)
+{
+	gpio -> BSRR = (mask);
+}
+
+static INLINE void GPIO_LowMsk(GPIO_TypeDef * const restrict gpio, uint16_t mask)
+{
+	gpio -> BRR = mask;
+}
+
+static INLINE void GPIO_HiLowMsk(GPIO_TypeDef * const restrict gpio, uint16_t hiMask, uint16_t lowMask)
+{
+	gpio -> BSRR = ((uint32_t)hiMask) | (((uint32_t)lowMask)<<16);
+}
+
 static INLINE int GPIO_Get(GPIO_TypeDef * const restrict gpio, int pin)
 {
 	return (gpio -> IDR & (1 << pin));
@@ -127,5 +142,12 @@ static INLINE int GPIO_Get01(GPIO_TypeDef * const restrict gpio, int pin)
 	return !!(gpio -> IDR & (1 << pin));
 }
 
+#define GPIO(b_) GPIO_(b_)
+#define GPIO_(b_) (GPIO##b_)
+
+#define GPIOxEN(b_) (RCC->AHBENR |= AHBEN_(b_))
+#define AHBEN_(b_) (RCC_AHBENR_GPIO##b_##EN)
+
+#define _BV(b_) (1<<(b_))
 
 #endif /* GPIO_H_ */
